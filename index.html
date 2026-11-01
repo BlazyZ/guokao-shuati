@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="国考刷题本">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>国考刷题本 · 计算机/数据类专门科目</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ========== 首页 ========== -->
+<div id="page-home" class="page">
+  <header class="hero">
+    <h1>📘 国考刷题本</h1>
+    <p class="sub">计算机 / 数据类专门科目 + 金融经济知识</p>
+    <div class="hero-stats" id="hero-stats"></div>
+  </header>
+
+  <div class="quick-actions">
+    <button class="qa-btn primary" id="btn-continue">▶️ 继续上次练习</button>
+    <button class="qa-btn" id="btn-seq-all">📖 全部顺序刷</button>
+    <button class="qa-btn" id="btn-random">🎲 随机刷题</button>
+  </div>
+  <div class="quick-actions">
+    <button class="qa-btn wrong" id="btn-wrong">❌ 错题本 <span class="badge" id="wrong-count">0</span></button>
+    <button class="qa-btn star" id="btn-star">⭐ 我的收藏 <span class="badge" id="star-count">0</span></button>
+    <button class="qa-btn" id="btn-stats">📊 统计 / 设置</button>
+  </div>
+
+  <main id="home-list" class="home-list"></main>
+
+  <footer class="foot">按往年金融监管总局·计算机/数据类专门科目高频考点编写的原创模拟题 · 仅供个人备考练习</footer>
+</div>
+
+<!-- ========== 练习页 ========== -->
+<div id="page-practice" class="page hidden">
+  <div class="practice-top">
+    <button class="icon-btn" id="btn-back-home">‹ 返回</button>
+    <div class="practice-title" id="practice-title"></div>
+    <button class="icon-btn" id="btn-sheet">答题卡</button>
+  </div>
+  <div class="progress-bar"><div class="progress-inner" id="progress-inner"></div></div>
+  <div class="q-meta" id="q-meta"></div>
+
+  <div class="q-box" id="q-box">
+    <div class="q-text" id="q-text"></div>
+    <div class="q-opts" id="q-opts"></div>
+    <div class="q-explain hidden" id="q-explain"></div>
+  </div>
+
+  <div class="practice-bottom">
+    <button class="nav-btn" id="btn-prev">← 上一题</button>
+    <button class="icon-btn star-toggle" id="btn-star-toggle">☆ 收藏</button>
+    <button class="nav-btn" id="btn-next">下一题 →</button>
+  </div>
+</div>
+
+<!-- ========== 答题卡弹层 ========== -->
+<div id="sheet-mask" class="mask hidden">
+  <div class="sheet-panel">
+    <div class="sheet-head">
+      <span>答题卡</span>
+      <button class="icon-btn" id="btn-sheet-close">✕ 关闭</button>
+    </div>
+    <div class="sheet-legend">
+      <span><i class="dot done-right"></i>答对</span>
+      <span><i class="dot done-wrong"></i>答错</span>
+      <span><i class="dot"></i>未做</span>
+    </div>
+    <div class="sheet-grid" id="sheet-grid"></div>
+  </div>
+</div>
+
+<!-- ========== 统计/设置页 ========== -->
+<div id="page-stats" class="page hidden">
+  <div class="practice-top">
+    <button class="icon-btn" id="btn-back-home2">‹ 返回</button>
+    <div class="practice-title">📊 学习统计</div>
+    <span></span>
+  </div>
+  <div class="stats-body" id="stats-body"></div>
+
+  <div class="settings-box">
+    <h3>🗂 自定义题库导入 / 导出</h3>
+    <p class="tip">支持导入与本题库相同格式的 JSON（可从粉笔等题库整理后导入）。导出的文件包含你的自定义题目和全部学习进度，可用于备份或在不同设备间迁移。</p>
+    <div class="settings-actions">
+      <button class="qa-btn" id="btn-export">⬇️ 导出数据（备份）</button>
+      <button class="qa-btn" id="btn-import-show">⬆️ 导入自定义题库</button>
+    </div>
+    <div id="import-area" class="hidden">
+      <textarea id="import-text" placeholder="将题库 JSON 粘贴到这里…"></textarea>
+      <div class="settings-actions">
+        <button class="qa-btn primary" id="btn-import-do">确认导入</button>
+        <button class="qa-btn" id="btn-import-tpl">下载模板格式</button>
+      </div>
+    </div>
+    <h3 class="danger-title">⚠️ 数据管理</h3>
+    <div class="settings-actions">
+      <button class="qa-btn danger" id="btn-clear-wrong">清空错题本</button>
+      <button class="qa-btn danger" id="btn-clear-all">清空全部学习记录</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="data/part1-zy-jichu.js"></script>
+<script src="data/part2-zy-bigdata.js"></script>
+<script src="data/part3-jinrong.js"></script>
+<script src="app.js"></script>
+<script>
+// 注册 Service Worker：首次联网访问后整站缓存，之后断网/电脑关机也能在 iPad 上打开
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", function () {
+    navigator.serviceWorker.register("sw.js").catch(function () {});
+  });
+}
+</script>
+</body>
+</html>
